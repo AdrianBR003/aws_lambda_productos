@@ -59,7 +59,7 @@ public class lambda_productos implements RequestHandler<APIGatewayV2HTTPEvent, A
             }
             Producto producto = objectMapper.readValue(body, Producto.class);
             if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
-                return createResponse(400, "Falta el campo 'nombre'.");
+                return createResponse(400, "Falta el campo 'nombre'");
             }
             if (producto.getId_producto() == null || producto.getId_producto().trim().isEmpty()) {
                 producto.setId_producto(UUID.randomUUID().toString());
@@ -67,45 +67,13 @@ public class lambda_productos implements RequestHandler<APIGatewayV2HTTPEvent, A
             Map<String, AttributeValue> item = new HashMap<>();
             item.put("id_producto", AttributeValue.builder().s(producto.getId_producto()).build());
             item.put("nombre", AttributeValue.builder().s(producto.getNombre()).build());
-            if (producto.getDescripcion() != null) {
-                item.put("descripcion", AttributeValue.builder().s(producto.getDescripcion()).build());
+            if (producto.getPrecio() != 0) {
+                item.put("precio", AttributeValue.builder().s(String.valueOf(producto.getPrecio())).build());
             }
-            if (producto.getCategoria() != null) {
-                item.put("categoria", AttributeValue.builder().s(producto.getCategoria()).build());
+            if (producto.getCantidad() != 0) {
+                item.put("precio", AttributeValue.builder().s(String.valueOf(producto.getCantidad())).build());
             }
-            if (producto.getFabricante() != null) {
-                item.put("fabricante", AttributeValue.builder().s(producto.getFabricante()).build());
-            }
-            if (producto.getEstado() != null) {
-                item.put("estado", AttributeValue.builder().s(producto.getEstado()).build());
-            }
-            if (producto.getNumero_serie() != null) {
-                item.put("numero_serie", AttributeValue.builder().s(producto.getNumero_serie()).build());
-            }
-            if (producto.getResponsable() != null) {
-                item.put("responsable", AttributeValue.builder().s(producto.getResponsable()).build());
-            }
-            if (producto.getUbicacion_actual() != null) {
-                item.put("ubicacion_actual", AttributeValue.builder().s(producto.getUbicacion_actual()).build());
-            }
-            if (producto.getId_coleccion() != null) {
-                item.put("id_coleccion", AttributeValue.builder().s(producto.getId_coleccion()).build());
-            }
-            if (producto.getCosto_adquisicion() != null) {
-                item.put("costo_adquisicion", AttributeValue.builder().n(producto.getCosto_adquisicion().toString()).build());
-            }
-            if (producto.getFecha_adquisicion() != null) {
-                item.put("fecha_adquisicion", AttributeValue.builder().s(producto.getFecha_adquisicion()).build());
-            }
-            if (producto.getVida_util() != null) {
-                item.put("vida_util", AttributeValue.builder().n(producto.getVida_util().toString()).build());
-            }
-            if (producto.getUltima_version() != null) {
-                item.put("ultima_version", AttributeValue.builder().s(producto.getUltima_version()).build());
-            }
-            if (producto.getHistorial_movimientos() != null && !producto.getHistorial_movimientos().isEmpty()) {
-                item.put("historial_movimientos", AttributeValue.builder().ss(producto.getHistorial_movimientos()).build());
-            }
+
             dynamoDbClient.putItem(PutItemRequest.builder().tableName(tableName).item(item).build());
             context.getLogger().log("Producto creado con ID: " + producto.getId_producto());
             return createResponse(200, objectMapper.writeValueAsString(producto));
@@ -144,6 +112,8 @@ public class lambda_productos implements RequestHandler<APIGatewayV2HTTPEvent, A
         }
     }
 
+
+
     private APIGatewayProxyResponseEvent createResponse(int statusCode, String body) {
         return new APIGatewayProxyResponseEvent().withStatusCode(statusCode).withBody(body);
     }
@@ -151,109 +121,40 @@ public class lambda_productos implements RequestHandler<APIGatewayV2HTTPEvent, A
     public static class Producto {
         private String id_producto;
         private String nombre;
-        private String descripcion;
-        private String categoria;
-        private String fabricante;
-        private String estado;
-        private String numero_serie;
-        private String responsable;
-        private String ubicacion_actual;
-        private String id_coleccion;
-        private Double costo_adquisicion;
-        private String fecha_adquisicion;
-        private Integer vida_util;
-        private String ultima_version;
-        private List<String> historial_movimientos;
+        private double precio;
+        private int cantidad;
+
 
         public String getId_producto() {
             return id_producto;
         }
+
         public void setId_producto(String id_producto) {
             this.id_producto = id_producto;
         }
+
         public String getNombre() {
             return nombre;
         }
+
         public void setNombre(String nombre) {
             this.nombre = nombre;
         }
-        public String getDescripcion() {
-            return descripcion;
+
+        public double getPrecio() {
+            return precio;
         }
-        public void setDescripcion(String descripcion) {
-            this.descripcion = descripcion;
+
+        public void setPrecio(double precio) {
+            this.precio = precio;
         }
-        public String getCategoria() {
-            return categoria;
+
+        public int getCantidad() {
+            return cantidad;
         }
-        public void setCategoria(String categoria) {
-            this.categoria = categoria;
-        }
-        public String getFabricante() {
-            return fabricante;
-        }
-        public void setFabricante(String fabricante) {
-            this.fabricante = fabricante;
-        }
-        public String getEstado() {
-            return estado;
-        }
-        public void setEstado(String estado) {
-            this.estado = estado;
-        }
-        public String getNumero_serie() {
-            return numero_serie;
-        }
-        public void setNumero_serie(String numero_serie) {
-            this.numero_serie = numero_serie;
-        }
-        public String getResponsable() {
-            return responsable;
-        }
-        public void setResponsable(String responsable) {
-            this.responsable = responsable;
-        }
-        public String getUbicacion_actual() {
-            return ubicacion_actual;
-        }
-        public void setUbicacion_actual(String ubicacion_actual) {
-            this.ubicacion_actual = ubicacion_actual;
-        }
-        public String getId_coleccion() {
-            return id_coleccion;
-        }
-        public void setId_coleccion(String id_coleccion) {
-            this.id_coleccion = id_coleccion;
-        }
-        public Double getCosto_adquisicion() {
-            return costo_adquisicion;
-        }
-        public void setCosto_adquisicion(Double costo_adquisicion) {
-            this.costo_adquisicion = costo_adquisicion;
-        }
-        public String getFecha_adquisicion() {
-            return fecha_adquisicion;
-        }
-        public void setFecha_adquisicion(String fecha_adquisicion) {
-            this.fecha_adquisicion = fecha_adquisicion;
-        }
-        public Integer getVida_util() {
-            return vida_util;
-        }
-        public void setVida_util(Integer vida_util) {
-            this.vida_util = vida_util;
-        }
-        public String getUltima_version() {
-            return ultima_version;
-        }
-        public void setUltima_version(String ultima_version) {
-            this.ultima_version = ultima_version;
-        }
-        public List<String> getHistorial_movimientos() {
-            return historial_movimientos;
-        }
-        public void setHistorial_movimientos(List<String> historial_movimientos) {
-            this.historial_movimientos = historial_movimientos;
+
+        public void setCantidad(int cantidad) {
+            this.cantidad = cantidad;
         }
     }
 }
