@@ -116,7 +116,11 @@ public class lambda_productos implements RequestHandler<APIGatewayV2HTTPEvent, A
                     .build();
 
             dynamoDbClient.updateItem(request);
-            return createResponse(200, "Producto actualizado correctamente.");
+            // Creamos la respuesta añadiendo el mensaje como un parametro más
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("id_producto", id_producto);
+            responseMap.put("mensaje", "Producto actualizado correctamente.");
+            return createResponse(200, objectMapper.writeValueAsString(responseMap));
 
         } catch (Exception e) {
             context.getLogger().log("ERROR en modifyProductobyID: " + e.getMessage());
